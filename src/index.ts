@@ -15,6 +15,8 @@ const JWT_SECRET =
   Deno.env.get("JWT_SECRET") ?? config({ safe: true }).JWT_SECRET;
 const DENO_ORIGIN =
   Deno.env.get("DENO_ORIGIN") ?? config({ safe: true }).DENO_ORIGIN;
+const VERIFY_JWT =
+  (Deno.env.get("VERIFY_JWT") ?? config({ safe: true }).VERIFY_JWT) === "true";
 
 function getAuthToken(ctx: Context) {
   const authHeader = ctx.request.headers.get("authorization");
@@ -104,7 +106,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
     );
   }
 
-  if (request.method !== "OPTIONS") {
+  if (request.method !== "OPTIONS" && VERIFY_JWT) {
     const token = getAuthToken(ctx);
     const isValidJWT = await verifyJWT(token);
 
