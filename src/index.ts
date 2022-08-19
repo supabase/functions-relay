@@ -3,29 +3,29 @@ import {
   Request,
   Status,
   Context,
-} from 'https://deno.land/x/oak@v10.3.0/mod.ts';
-import * as jose from 'https://deno.land/x/jose@v4.3.7/index.ts';
-import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts';
+} from "https://deno.land/x/oak@v10.3.0/mod.ts";
+import * as jose from "https://deno.land/x/jose@v4.3.7/index.ts";
+import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
 
 const app = new Application();
 
-const X_FORWARDED_HOST = 'x-forwarded-host';
+const X_FORWARDED_HOST = "x-forwarded-host";
 
 const JWT_SECRET =
-  Deno.env.get('JWT_SECRET') ?? config({ safe: true }).JWT_SECRET;
+  Deno.env.get("JWT_SECRET") ?? config({ safe: true }).JWT_SECRET;
 const DENO_ORIGIN =
-  Deno.env.get('DENO_ORIGIN') ?? config({ safe: true }).DENO_ORIGIN;
+  Deno.env.get("DENO_ORIGIN") ?? config({ safe: true }).DENO_ORIGIN;
 const VERIFY_JWT =
-  (Deno.env.get('VERIFY_JWT') ?? config({ safe: true }).VERIFY_JWT) === 'true';
+  (Deno.env.get("VERIFY_JWT") ?? config({ safe: true }).VERIFY_JWT) === "true";
 
 function getAuthToken(ctx: Context) {
-  const authHeader = ctx.request.headers.get('authorization');
+  const authHeader = ctx.request.headers.get("authorization");
   if (!authHeader) {
-    ctx.throw(Status.Unauthorized, 'Missing authorization header');
+    ctx.throw(Status.Unauthorized, "Missing authorization header");
   }
-  const [bearer, token] = authHeader.split(' ');
-  if (bearer !== 'Bearer') {
-    ctx.throw(Status.Unauthorized, `Auth header is not 'Bearer {token}'`);
+  const [bearer, token] = authHeader.split(" ");
+  if (bearer !== "Bearer") {
+    ctx.throw(Status.Unauthorized, `Auth header is not "Bearer {token}"`);
   }
   return token;
 }
@@ -44,7 +44,7 @@ async function verifyJWT(jwt: string): Promise<boolean> {
 
 function sanitizeHeaders(headers: Headers): Headers {
   const sanitizedHeaders = new Headers();
-  const headerDenyList = ['set-cookie'];
+  const headerDenyList = ["set-cookie"];
   headers.forEach((value, key) => {
     if (!headerDenyList.includes(key.toLowerCase())) {
       sanitizedHeaders.set(key, value);
@@ -71,7 +71,7 @@ function patchedReq(req: Request): [URL, RequestInit] {
         [X_FORWARDED_HOST]: xHost,
       },
       body: (req.hasBody
-        ? req.body({ type: 'stream' }).value
+        ? req.body({ type: "stream" }).value
         : undefined) as unknown as BodyInit,
       method: req.method,
     },
@@ -84,15 +84,15 @@ async function relayTo(req: Request): Promise<Response> {
 }
 
 function isWebsocketUpgrade(req: Request) {
-  return req.method === 'GET'
-    && req.headers.get('connection')?.toLowerCase() === 'upgrade'
-    && req.headers.get('upgrade')?.toLowerCase() === 'websocket';
+  return req.method === "GET"
+    && req.headers.get("connection")?.toLowerCase() === "upgrade"
+    && req.headers.get("upgrade")?.toLowerCase() === "websocket";
 }
 
 async function relayWebsocket(ctx: Context) {
   const [url] = patchedReq(ctx.request);
 
-  url.protocol = url.protocol.replace('http', 'ws');
+  url.protocol = url.protocol.replace("http", "ws");
 
   await new Promise<void>((resolve) => {
     const upstream = new WebSocket(url);
@@ -116,7 +116,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   } catch (err) {
     console.error(err);
     ctx.response.body = err.message;
-    ctx.response.headers.append('x-relay-error', 'true');
+    ctx.response.headers.append("x-relay-error", "true");
     ctx.response.status = err.status || 500;
   }
 });
@@ -124,20 +124,20 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   const { request, response } = ctx;
 
-  if (!(request.method === 'POST' || request.method === 'OPTIONS' || isWebsocketUpgrade(request))) {
+  if (!(request.method === "POST" || request.method === "OPTIONS" || isWebsocketUpgrade(request))) {
     console.error(`${request.method} not supported`);
     return ctx.throw(
       Status.MethodNotAllowed,
-      'Only POST and OPTIONS requests are supported'
+      "Only POST and OPTIONS requests are supported"
     );
   }
 
-  if (request.method !== 'OPTIONS' && VERIFY_JWT) {
+  if (request.method !== "OPTIONS" && VERIFY_JWT) {
     const token = getAuthToken(ctx);
     const isValidJWT = await verifyJWT(token);
 
     if (!isValidJWT) {
-      return ctx.throw(Status.Unauthorized, 'Invalid JWT');
+      return ctx.throw(Status.Unauthorized, "Invalid JWT");
     }
   }
 
@@ -156,7 +156,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 
 if (import.meta.main) {
   const port = parseInt(Deno.args?.[0] ?? 8081);
-  const hostname = '0.0.0.0';
+  const hostname = "0.0.0.0";
 
   console.log(`Listening on http://${hostname}:${port}`);
   await app.listen({ port, hostname });
