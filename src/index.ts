@@ -84,7 +84,7 @@ async function relayTo(req: Request): Promise<Response> {
 }
 
 function isWebsocketUpgrade(req: Request) {
-  return req.method === 'GET' && req.headers.get('upgrade') === 'websocket';
+  return req.method === 'GET' && req.headers.get('upgrade')?.toLowerCase() === 'websocket';
 }
 
 async function relayWebsocket(ctx: Context) {
