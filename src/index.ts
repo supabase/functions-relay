@@ -45,6 +45,7 @@ async function verifyJWT(jwt: string): Promise<boolean> {
 function sanitizeHeaders(headers: Headers): Headers {
   const sanitizedHeaders = new Headers();
   const headerDenyList = ["set-cookie"];
+
   headers.forEach((value, key) => {
     if (!headerDenyList.includes(key.toLowerCase())) {
       sanitizedHeaders.set(key, value);
