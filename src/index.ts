@@ -25,7 +25,7 @@ function getAuthToken(ctx: Context) {
   }
   const [bearer, token] = authHeader.split(" ");
   if (bearer !== "Bearer") {
-    ctx.throw(Status.Unauthorized, `Auth header is not "Bearer {token}"`);
+    ctx.throw(Status.Unauthorized, `Auth header is not 'Bearer {token}'`);
   }
   return token;
 }
