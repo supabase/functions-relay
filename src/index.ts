@@ -98,13 +98,15 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   const { request, response } = ctx;
 
-  if (!(request.method === "POST" || request.method === "OPTIONS")) {
+  const supportedVerbs = ['POST', 'GET', 'OPTIONS'];
+  if (!(supportedVerbs.includes(request.method))) {
     console.error(`${request.method} not supported`);
     return ctx.throw(
       Status.MethodNotAllowed,
-      "Only POST and OPTIONS requests are supported"
+      `HTTP request method not supported (supported: ${supportedVerbs.join(' ')})`
     );
-  }
+  };
+
 
   if (request.method !== "OPTIONS" && VERIFY_JWT) {
     const token = getAuthToken(ctx);
@@ -117,9 +119,17 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 
   const resp = await relayTo(request);
 
+  const sanitizedHeaders = sanitizeHeaders(resp.headers);
+  if (request.method === "GET") {
+    const contentTypeHeader = sanitizedHeaders.get('Content-Type') || sanitizeHeaders.get('content-type');
+    if (contentTypeHeader.includes('text/html')) {
+      sanitizedHeaders.set('Content-Type', 'text/plain');
+    }
+  }
+
   response.body = resp.body;
   response.status = resp.status;
-  response.headers = sanitizeHeaders(resp.headers);
+  response.headers = sanitizedHeaders;
   response.type = resp.type;
 
   await next();
