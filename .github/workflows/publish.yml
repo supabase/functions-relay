@@ -20,6 +20,7 @@ jobs:
           images: |
             supabase/deno-relay
             public.ecr.aws/t3w2s2c9/deno-relay
+          flavor: latest=false
           tags: |
             type=raw,value=${{ inputs.version }}
       - uses: docker/setup-qemu-action@v2
