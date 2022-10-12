@@ -105,7 +105,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
       Status.MethodNotAllowed,
       `HTTP request method not supported (supported: ${supportedVerbs.join(' ')})`
     );
-  };
+  }
 
 
   if (request.method !== "OPTIONS" && VERIFY_JWT) {
@@ -121,8 +121,8 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 
   const sanitizedHeaders = sanitizeHeaders(resp.headers);
   if (request.method === "GET") {
-    const contentTypeHeader = sanitizedHeaders.get('Content-Type') || sanitizeHeaders.get('content-type');
-    if (contentTypeHeader.includes('text/html')) {
+    const contentTypeHeader = sanitizedHeaders.get('Content-Type');
+    if (contentTypeHeader?.includes('text/html')) {
       sanitizedHeaders.set('Content-Type', 'text/plain');
     }
   }
