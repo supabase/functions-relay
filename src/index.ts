@@ -98,7 +98,7 @@ app.use(async (ctx: Context, next: () => Promise<unknown>) => {
 app.use(async (ctx: Context, next: () => Promise<unknown>) => {
   const { request, response } = ctx;
 
-  const supportedVerbs = ['POST', 'GET', 'OPTIONS'];
+  const supportedVerbs = ['POST', 'GET','PUT', 'PATCH', 'DELETE', 'OPTIONS'];
   if (!(supportedVerbs.includes(request.method))) {
     console.error(`${request.method} not supported`);
     return ctx.throw(
