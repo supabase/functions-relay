@@ -1,4 +1,4 @@
-FROM lukechannings/deno:v1.27.1
+FROM lukechannings/deno:v1.28.0
 
 EXPOSE 8081
 WORKDIR /app
