@@ -1,6 +1,10 @@
-## Functions Relay
+## Functions Relay (Archived)
 
-Supabase Functions Relay is the API gateway which is run before any edge function is invoked. For more details see your Functions blog post [here](https://supabase.com/blog/2022/03/31/supabase-edge-functions)
+### Update (07/07/2023)
+
+This repo is no longer used. For any issues related to running Edge Functions via Supabase CLI, refer to [Edge Runtime](https://github.com/supabase/edge-runtime) repo
+
+Supabase Functions Relay is the API gateway which is run before any edge function is invoked. For more details see our Functions blog post [here](https://supabase.com/blog/2022/03/31/supabase-edge-functions)
 
 ### CONTRIBUTING
 
